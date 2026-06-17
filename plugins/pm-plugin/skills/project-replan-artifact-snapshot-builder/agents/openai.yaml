@@ -1,0 +1,5 @@
+interface:
+  display_name: Replan Artifact Snapshot Builder
+  short_description: Generate timestamped Excel and slide-deck snapshots from a timestamped replan without overwriting current artifacts.
+  icon: 📊
+  brand_color: '#2F855A'

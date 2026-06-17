@@ -1,0 +1,319 @@
+{
+  "_comment": "Excel template v1. Two responsibilities: (1) source_table defines the column schema that gantt_chart.md must follow when template_enabled is true. (2) excel defines how those columns map to Excel sheets and formatting. The source column names in both sections must match exactly.",
+
+  "meta": {
+    "version": "v1",
+    "template_enabled": true,
+    "project_name": "Project",
+    "description": "Standard project management template. Controls both the gantt_chart.md source table structure and the gantt_chart.xlsx output layout."
+  },
+
+  "source_table": {
+    "_comment": "Defines the ## Project management source table schema in gantt_chart.md. When template_enabled is true, Claude must use exactly these columns in this order when generating gantt_chart.md.",
+    "section_heading": "## Project management source table",
+    "columns": [
+      {
+        "name":        "Task ID",
+        "required":    true,
+        "type":        "text",
+        "align":       "left",
+        "description": "Stable identifier used across Mermaid chart, CSV, and Excel. Format: T1, T2 ... or M1, M2 for milestones.",
+        "default":     ""
+      },
+      {
+        "name":        "Work package",
+        "required":    true,
+        "type":        "text",
+        "align":       "left",
+        "description": "Phase or work package grouping label. Used as Mermaid section and Excel row grouping.",
+        "default":     "Unknown"
+      },
+      {
+        "name":        "Task",
+        "required":    true,
+        "type":        "text",
+        "align":       "left",
+        "description": "Short readable task label. Must be specific enough to use in a Gantt chart.",
+        "default":     ""
+      },
+      {
+        "name":        "Task description",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "Practical explanation of what the task produces or requires. Infer from task name if not provided and mark as inferred.",
+        "default":     "Unknown"
+      },
+      {
+        "name":        "Owner",
+        "required":    true,
+        "type":        "text",
+        "align":       "left",
+        "description": "Single person accountable for this task. One name only — no slashes, no lists.",
+        "default":     "Unknown"
+      },
+      {
+        "name":        "Time requirements",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "People and their time commitment for this task only. E.g. Yujia 2d, Jesús Calderón 0.5d. Use — if none.",
+        "default":     "—"
+      },
+      {
+        "name":        "Resource requirements",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "All non-people resources required: tools, software licenses, API access or credits, API usage limits, external services, approvals, budget, equipment, or any other resource constraint. People and their time go in Time requirements. Use — if none.",
+        "default":     "—"
+      },
+      {
+        "name":        "Estimated start",
+        "required":    true,
+        "type":        "date",
+        "align":       "right",
+        "description": "Start date in YYYY-MM-DD format. Use project start or predecessor end date if not provided. Mark as planning assumption.",
+        "default":     "Planning assumption"
+      },
+      {
+        "name":        "Estimated end",
+        "required":    true,
+        "type":        "date",
+        "align":       "right",
+        "description": "End date in YYYY-MM-DD format. Calculated from start + duration. Mark as planning assumption.",
+        "default":     "Planning assumption"
+      },
+      {
+        "name":        "Duration (business days)",
+        "required":    true,
+        "type":        "int",
+        "align":       "right",
+        "description": "Estimated length in business days. Use 0 for milestones. Estimate from task type if not provided and mark as assumption.",
+        "default":     "0"
+      },
+      {
+        "name":        "Timeline basis",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "Explains how the date or duration was determined: provided, inferred, assumed, or predecessor-based.",
+        "default":     "Planning assumption"
+      },
+      {
+        "name":        "Task bar",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "Human-readable date range label for the Gantt bar, e.g. Apr 1–7. Used in Mermaid chart display.",
+        "default":     "—"
+      },
+      {
+        "name":        "Milestone?",
+        "required":    true,
+        "type":        "boolean",
+        "align":       "left",
+        "description": "Yes or No. Mark Yes for approvals, deadlines, launches, final sign-offs, or key handoffs.",
+        "default":     "No"
+      },
+      {
+        "name":        "Milestone date",
+        "required":    false,
+        "type":        "date",
+        "align":       "right",
+        "description": "Date of the milestone in YYYY-MM-DD format. Populate only when Milestone? is Yes. Use — otherwise.",
+        "default":     "—"
+      },
+      {
+        "name":        "Depends on",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "Predecessor Task IDs as a comma-separated list, e.g. T1, T2. Use — if no dependency. Infer from visible task order if not provided.",
+        "default":     "—"
+      },
+      {
+        "name":        "Progress",
+        "required":    true,
+        "type":        "percent",
+        "align":       "right",
+        "description": "Percent complete as an integer followed by %, e.g. 0% or 50%. Use Unknown if not visible.",
+        "default":     "0%"
+      },
+      {
+        "name":        "Status",
+        "required":    true,
+        "type":        "text",
+        "align":       "left",
+        "description": "One of: Not started, In progress, At risk, Delayed, Complete, Unknown.",
+        "default":     "Unknown"
+      },
+      {
+        "name":        "Source evidence",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "Reference to the source of this row: questionnaire question number, plan section, update file, etc.",
+        "default":     "—"
+      },
+      {
+        "name":        "Assumption / unknown notes",
+        "required":    false,
+        "type":        "text",
+        "align":       "left",
+        "description": "Free text. Record every estimate, assumption, external dependency, or missing piece of information here.",
+        "default":     "—"
+      }
+    ]
+  },
+
+  "excel": {
+    "_comment": "Controls the gantt_chart.xlsx output. Column source values must match source_table column names exactly.",
+
+    "colors": {
+      "title_bg":         "1F3864",
+      "header_bg":        "2E75B6",
+      "alt_row":          "DEEAF1",
+      "milestone_row":    "EAD1DC",
+      "milestone_header": "7030A0",
+      "today_highlight":  "FFC000",
+      "white":            "FFFFFF",
+      "light_grey":       "F2F2F2"
+    },
+
+    "status_colors": {
+      "at risk":     "FFE699",
+      "not started": "F2F2F2",
+      "in progress": "DDEBF7",
+      "complete":    "E2EFDA"
+    },
+
+    "sheets": [
+
+      {
+        "name": "Project View",
+        "title": "{project_name} — Project View",
+        "title_color": "1F3864",
+        "header_color": "2E75B6",
+        "freeze_panes": "A3",
+        "auto_filter": true,
+        "row_height": 40,
+        "alt_row_color": "DEEAF1",
+        "milestone_row_color": "EAD1DC",
+        "apply_status_color": true,
+        "columns": [
+          { "header": "Task ID",               "source": "Task ID",                    "width": 8,  "type": "text"    },
+          { "header": "Work Package",           "source": "Work package",               "width": 22, "type": "text"    },
+          { "header": "Task",                   "source": "Task",                       "width": 26, "type": "text"    },
+          { "header": "Task Description",       "source": "Task description",           "width": 42, "type": "text",    "wrap": true },
+          { "header": "Owner",                   "source": "Owner",                      "width": 18, "type": "text"    },
+          { "header": "Time Requirements",       "source": "Time requirements",          "width": 22, "type": "text",    "wrap": true },
+          { "header": "Resource Requirements",   "source": "Resource requirements",      "width": 22, "type": "text",    "wrap": true },
+          { "header": "Est. Start",             "source": "Estimated start",            "width": 14, "type": "date"    },
+          { "header": "Est. End",               "source": "Estimated end",              "width": 14, "type": "date"    },
+          { "header": "Duration (days)",        "source": "Duration (business days)",   "width": 10, "type": "int"     },
+          { "header": "Milestone?",             "source": "Milestone?",                 "width": 10, "type": "text"    },
+          { "header": "Milestone Date",         "source": "Milestone date",             "width": 14, "type": "date"    },
+          { "header": "Depends On",             "source": "Depends on",                 "width": 14, "type": "text"    },
+          { "header": "Progress",               "source": "Progress",                   "width": 10, "type": "percent" },
+          { "header": "Status",                 "source": "Status",                     "width": 14, "type": "text"    },
+          { "header": "Notes",                  "source": "Assumption / unknown notes", "width": 40, "type": "text",    "wrap": true }
+        ]
+      },
+
+      {
+        "name": "Gantt Timeline",
+        "title": "{project_name} — Gantt Timeline",
+        "title_color": "1F3864",
+        "header_color": "2E75B6",
+        "freeze_panes": "auto",
+        "row_height": 18,
+        "time_unit": "day",
+        "day_col_width": 3,
+        "bar_color": "2E75B6",
+        "bar_remaining_color": "BDD7EE",
+        "milestone_bar_color": "7030A0",
+        "milestone_symbol": "◆",
+        "bar_shading": "progress",
+        "bar_progress_colors": [
+          { "min": 0,   "max": 0,   "color": "F2F2F2" },
+          { "min": 1,   "max": 25,  "color": "DEEAF1" },
+          { "min": 26,  "max": 50,  "color": "BDD7EE" },
+          { "min": 51,  "max": 75,  "color": "70ADDB" },
+          { "min": 76,  "max": 99,  "color": "2E75B6" },
+          { "min": 100, "max": 100, "color": "1F3864" }
+        ],
+        "fixed_columns": [
+          { "header": "Task ID",      "source": "Task ID",                  "width": 10, "type": "text" },
+          { "header": "Task",         "source": "Task",                     "width": 28, "type": "text" },
+          { "header": "Owner",        "source": "Owner",                    "width": 16, "type": "text" },
+          { "header": "Start",        "source": "Estimated start",          "width": 13, "type": "date" },
+          { "header": "End",          "source": "Estimated end",            "width": 13, "type": "date" },
+          { "header": "Duration (d)", "source": "Duration (business days)", "width": 8,  "type": "text" }
+        ]
+      },
+
+      {
+        "name": "Milestones",
+        "title": "{project_name} — Milestones",
+        "title_color": "1F3864",
+        "header_color": "7030A0",
+        "freeze_panes": "A3",
+        "row_height": 30,
+        "alt_row_color": "F3E6F9",
+        "filter": { "column": "Milestone?", "value": "yes" },
+        "columns": [
+          { "header": "Task ID",          "source": "Task ID",                    "width": 10, "type": "text" },
+          { "header": "Milestone / Task", "source": "Task",                       "width": 32, "type": "text" },
+          { "header": "Milestone Date",   "source": "Milestone date",             "width": 16, "type": "date" },
+          { "header": "Owner",            "source": "Owner",                      "width": 18, "type": "text" },
+          { "header": "Depends On",       "source": "Depends on",                 "width": 16, "type": "text" },
+          { "header": "Status",           "source": "Status",                     "width": 14, "type": "text" },
+          { "header": "Notes",            "source": "Assumption / unknown notes", "width": 45, "type": "text", "wrap": true }
+        ]
+      },
+
+      {
+        "name": "Resources",
+        "title": "{project_name} — Resource Requirements",
+        "title_color": "1F3864",
+        "header_color": "375623",
+        "freeze_panes": "A3",
+        "row_height": 36,
+        "alt_row_color": "E2EFDA",
+        "apply_status_color": true,
+        "columns": [
+          { "header": "Task ID",               "source": "Task ID",                    "width": 10, "type": "text" },
+          { "header": "Task",                  "source": "Task",                       "width": 28, "type": "text" },
+          { "header": "Owner",                 "source": "Owner",                      "width": 18, "type": "text" },
+          { "header": "Time Requirements",     "source": "Time requirements",          "width": 28, "type": "text", "wrap": true },
+          { "header": "Resource Requirements", "source": "Resource requirements",      "width": 28, "type": "text", "wrap": true },
+          { "header": "Status",                "source": "Status",                     "width": 14, "type": "text" },
+          { "header": "Notes",                 "source": "Assumption / unknown notes", "width": 40, "type": "text", "wrap": true }
+        ]
+      },
+
+      {
+        "name": "Assumptions Unknowns",
+        "title": "{project_name} — Assumptions and Unknowns",
+        "title_color": "1F3864",
+        "header_color": "843C0C",
+        "freeze_panes": "A3",
+        "row_height": 40,
+        "filter": { "column": "Assumption / unknown notes", "exclude_empty": true },
+        "row_colors": {
+          "assumption": "FFF2CC",
+          "unknown":    "FFE0E0",
+          "default":    "F2F2F2"
+        },
+        "columns": [
+          { "header": "Task ID",              "source": "Task ID",                    "width": 10, "type": "text" },
+          { "header": "Task",                 "source": "Task",                       "width": 28, "type": "text" },
+          { "header": "Type",                 "source": "_computed_assumption_type",  "width": 18, "type": "text" },
+          { "header": "Assumption / Unknown", "source": "Assumption / unknown notes", "width": 60, "type": "text", "wrap": true }
+        ]
+      }
+
+    ]
+  }
+}

@@ -1,0 +1,3 @@
+interface:
+  display_name: Project Update Intake
+  short_description: Consolidate update folders into update.md for plan changes.

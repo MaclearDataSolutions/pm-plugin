@@ -1,0 +1,5 @@
+interface:
+  display_name: Questionnaire Project Plan
+  short_description: Turn completed owner questionnaires into Gantt-ready project plans.
+  icon: clipboard-list
+  accent_color: '#3B82F6'

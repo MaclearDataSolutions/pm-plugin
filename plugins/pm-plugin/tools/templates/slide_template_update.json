@@ -1,0 +1,117 @@
+{
+  "_comment": "Project Update Deck template v1. Based on project_update_deck.pptx design: 5 slides for recurring status updates. Draws from project_plan.md, gantt_tasks.csv, and update.md (if present). Same Aptos font / {company} design system as the intro deck.",
+
+  "meta": {
+    "version": "v1",
+    "template_enabled": true,
+    "project_name": "Project",
+    "deck_type": "update",
+    "description": "Recurring project status update deck. 5 slides. Use for weekly / milestone update meetings.",
+    "pptx_template": "tools/templates/slide_template_update.pptx"
+  },
+
+  "sources": {
+    "project_plan": "project_plan.md",
+    "gantt_csv":    "gantt_tasks.csv",
+    "update_notes": "update.md"
+  },
+
+  "style": {
+    "primary_color":    "1F3864",
+    "secondary_color":  "2E75B6",
+    "accent_color":     "FFC000",
+    "text_color":       "1A1A1A",
+    "background_color": "FFFFFF",
+    "font_title":       "Aptos Display",
+    "font_body":        "Aptos",
+    "font_size_title":  28,
+    "font_size_body":   15,
+    "footer_text":      "{company} | {project_name} | Confidential"
+  },
+
+  "slides": [
+
+    {
+      "id": "S1",
+      "name": "Title",
+      "layout": "Blank",
+      "title": "{project_name}",
+      "subtitle": "Project Update",
+      "author_line": "{owner} | {company} | {date}",
+      "content_type": "title_only",
+      "speaker_notes": "State the project name, update number or date, and who is presenting."
+    },
+
+    {
+      "id": "S2",
+      "name": "Executive Summary",
+      "layout": "Blank",
+      "title": "Executive Summary",
+      "descriptor": "Overall status and key messages",
+      "content_type": "update_summary",
+      "content_source": {
+        "primary_file": "update_notes",
+        "fallback_file": "project_plan",
+        "fallback_section": "21. Recommended next steps"
+      },
+      "status_badge": true,
+      "max_bullets": 6,
+      "footer": true,
+      "speaker_notes": "Lead with overall project status (On track / At risk / Delayed). Cover what was done since last update, what is planned next, and any key decisions made."
+    },
+
+    {
+      "id": "S3",
+      "name": "Milestone Progress",
+      "layout": "Blank",
+      "title": "Milestone Progress",
+      "descriptor": "Status as of {date}",
+      "content_type": "milestone_status",
+      "content_source": {
+        "file": "gantt_csv",
+        "filter": { "column": "Milestone?", "value": "Yes" }
+      },
+      "table_columns": ["Task ID", "Task", "Milestone date", "Owner", "Progress", "Status"],
+      "max_rows": 6,
+      "footer": true,
+      "speaker_notes": "Walk through each milestone. Flag any that have slipped and explain the recovery plan."
+    },
+
+    {
+      "id": "S4",
+      "name": "Risks and Issues",
+      "layout": "Blank",
+      "title": "Risks and Issues",
+      "descriptor": "Active risks requiring attention",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "16. Risk register",
+        "fields": []
+      },
+      "table_columns": ["Risk", "Probability", "Severity", "Response / mitigation", "Owner"],
+      "max_rows": 5,
+      "footer": true,
+      "speaker_notes": "Focus on new or escalated risks since the last update. Note any risks that have been resolved."
+    },
+
+    {
+      "id": "S5",
+      "name": "Open Decisions",
+      "layout": "Blank",
+      "title": "Open Decisions and Confirmations Needed",
+      "descriptor": "Items blocking schedule or execution",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "20. Open questions before final Gantt chart",
+        "fields": []
+      },
+      "table_columns": ["Priority", "Question", "Who should answer"],
+      "max_rows": 5,
+      "footer": true,
+      "speaker_notes": "These are blockers. Assign an owner and a deadline for each before leaving the meeting."
+    }
+
+  ]
+}

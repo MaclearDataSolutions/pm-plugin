@@ -1,0 +1,7 @@
+{
+  "role": "project",
+  "project_name": "Your Project Name",
+  "jira_project_key": "PROJ",
+  "jira_cloud_id": "your-org.atlassian.net",
+  "owner": "your.email@company.com"
+}

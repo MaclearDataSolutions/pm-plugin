@@ -1,0 +1,5 @@
+interface:
+  display_name: Progress Plan Log Appender
+  short_description: Appends dated progress notes to project_plan.md without replanning.
+  icon: file-plus
+  brand_color: '#059669'

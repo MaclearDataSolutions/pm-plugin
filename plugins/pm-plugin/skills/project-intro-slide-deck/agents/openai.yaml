@@ -1,0 +1,5 @@
+interface:
+  display_name: Project Intro Slide Deck
+  short_description: Create an owner/stakeholder project introduction deck from a project plan and Gantt tasks.
+  icon: file-presentation
+  brand_color: '#2563EB'

@@ -1,0 +1,5 @@
+interface:
+  display_name: Project Replan Snapshot Builder
+  short_description: Build timestamped project plan snapshots from approved change updates without modifying the current plan.
+  icon: 🗂️
+  brand_color: '#2B6CB0'

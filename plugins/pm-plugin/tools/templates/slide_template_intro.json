@@ -1,0 +1,240 @@
+{
+  "_comment": "Project Introduction Deck template v1. Based on project_intro_deck.pptx design: Aptos Display / Aptos fonts, Blank layout with custom shapes, footer on every content slide, two-column scope slide, checkmark success slide, Gantt image from Excel.",
+
+  "meta": {
+    "version": "v1",
+    "template_enabled": true,
+    "project_name": "Project",
+    "deck_type": "intro",
+    "description": "Project introduction / kickoff deck. 11 slides. Matches the {company} project_intro_deck.pptx design system.",
+    "pptx_template": "tools/templates/slide_template_intro.pptx"
+  },
+
+  "sources": {
+    "project_plan": "project_plan.md",
+    "gantt_csv":    "gantt_tasks.csv",
+    "gantt_excel":  "gantt_chart.xlsx"
+  },
+
+  "gantt_image": {
+    "sheet":       "Gantt Timeline",
+    "export_path": "gantt_timeline_export.png",
+    "dpi":         150,
+    "row_end":     null,
+    "col_end":     null
+  },
+
+  "style": {
+    "primary_color":    "1F3864",
+    "secondary_color":  "2E75B6",
+    "accent_color":     "FFC000",
+    "text_color":       "1A1A1A",
+    "background_color": "FFFFFF",
+    "font_title":       "Aptos Display",
+    "font_body":        "Aptos",
+    "font_size_title":  28,
+    "font_size_body":   15,
+    "footer_text":      "{company} | {project_name} | Confidential"
+  },
+
+  "slides": [
+
+    {
+      "id": "S1",
+      "name": "Title",
+      "layout": "Blank",
+      "title": "{project_name}",
+      "subtitle": "Project Introduction",
+      "author_line": "{owner} | {company} | {date}",
+      "content_type": "title_only",
+      "speaker_notes": "Welcome and introduce the project. State the project name, sponsor, and today's date."
+    },
+
+    {
+      "id": "S2",
+      "name": "Why This Project Matters",
+      "layout": "Blank",
+      "title": "Why This Project Matters",
+      "descriptor": "Business problem and strategic value",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "4. Business purpose and success criteria",
+        "fields": ["Business problem", "Main business value"]
+      },
+      "max_bullets": 5,
+      "footer": true,
+      "speaker_notes": "Explain the business problem this project solves and the value it delivers to the firm."
+    },
+
+    {
+      "id": "S3",
+      "name": "Scope and Deliverables",
+      "layout": "Blank",
+      "title": "Scope and Deliverables",
+      "descriptor": "What is – and is not – included",
+      "content_type": "two_column_bullets",
+      "columns": [
+        {
+          "header": "IN SCOPE",
+          "header_color": "1F3864",
+          "content_source": { "section": "5. Scope", "fields": ["In scope"] },
+          "max_bullets": 8
+        },
+        {
+          "header": "OUT OF SCOPE",
+          "header_color": "843C0C",
+          "content_source": { "section": "5. Scope", "fields": ["Out of scope"] },
+          "max_bullets": 6
+        }
+      ],
+      "footer": true,
+      "speaker_notes": "Cover what is in scope and explicitly state what is not. Out of scope items prevent scope creep."
+    },
+
+    {
+      "id": "S4",
+      "name": "What Success Looks Like",
+      "layout": "Blank",
+      "title": "What Success Looks Like",
+      "descriptor": "Acceptance criteria",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "4. Business purpose and success criteria",
+        "fields": ["Success criteria"]
+      },
+      "bullet_prefix": "✓  ",
+      "max_bullets": 6,
+      "footer": true,
+      "speaker_notes": "Walk through each acceptance criterion. Make clear who signs off on each one."
+    },
+
+    {
+      "id": "S5",
+      "name": "Project Timeline",
+      "layout": "Blank",
+      "title": "Project Timeline",
+      "descriptor": "Estimated schedule",
+      "content_type": "gantt_image",
+      "gantt_source": "gantt_excel",
+      "image_position": {
+        "left_pct":   0.02,
+        "top_pct":    0.16,
+        "width_pct":  0.96,
+        "height_pct": 0.78
+      },
+      "footer": true,
+      "speaker_notes": "Walk through the timeline. Highlight the critical path, any parallel tracks, and at-risk tasks."
+    },
+
+    {
+      "id": "S6",
+      "name": "Key Milestones",
+      "layout": "Blank",
+      "title": "Key Milestones",
+      "descriptor": "Critical checkpoints",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "7. Milestones",
+        "fields": []
+      },
+      "table_columns": ["Milestone", "Target date", "Approval needed", "Notes"],
+      "max_rows": 6,
+      "footer": true,
+      "speaker_notes": "Highlight approval gates and hard deadlines. Call out any milestone already at risk."
+    },
+
+    {
+      "id": "S7",
+      "name": "Workstreams and Task Summary",
+      "layout": "Blank",
+      "title": "Workstreams and Task Summary",
+      "descriptor": "Phases, tasks, and status",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "8. Work breakdown structure",
+        "fields": []
+      },
+      "table_columns": ["Work package", "Description", "Deliverable supported"],
+      "max_rows": 8,
+      "footer": true,
+      "speaker_notes": "Summarise the main work packages. Keep it high level — detail is in the Gantt."
+    },
+
+    {
+      "id": "S8",
+      "name": "Roles and Responsibilities",
+      "layout": "Blank",
+      "title": "Roles and Responsibilities",
+      "descriptor": "Who does what",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "14. Resource plan",
+        "fields": []
+      },
+      "table_columns": ["Resource / role", "Person or vendor", "Responsibilities", "Planning risk"],
+      "max_rows": 6,
+      "footer": true,
+      "speaker_notes": "Introduce the team. Call out single points of failure or resource risks."
+    },
+
+    {
+      "id": "S9",
+      "name": "Key Risks and Mitigations",
+      "layout": "Blank",
+      "title": "Key Risks and Mitigations",
+      "descriptor": "Top risks and how they are managed",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "16. Risk register",
+        "fields": []
+      },
+      "table_columns": ["Risk", "Probability", "Severity", "Response / mitigation", "Owner"],
+      "max_rows": 5,
+      "footer": true,
+      "speaker_notes": "Cover the top risks. Focus on High severity items and who owns the mitigation."
+    },
+
+    {
+      "id": "S10",
+      "name": "Open Decisions",
+      "layout": "Blank",
+      "title": "Open Decisions and Confirmations Needed",
+      "descriptor": "Items blocking schedule or execution",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "20. Open questions before final Gantt chart",
+        "fields": []
+      },
+      "table_columns": ["Priority", "Question", "Why it matters", "Who should answer"],
+      "max_rows": 5,
+      "footer": true,
+      "speaker_notes": "These decisions need owners assigned in the room. Do not leave without clear next steps."
+    },
+
+    {
+      "id": "S11",
+      "name": "Recommended Next Steps",
+      "layout": "Blank",
+      "title": "Recommended Next Steps",
+      "descriptor": "Actions before project can proceed",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "21. Recommended next steps",
+        "fields": []
+      },
+      "bullet_prefix": "",
+      "max_bullets": 7,
+      "footer": true,
+      "speaker_notes": "Close with concrete actions and owners. Confirm who does what and by when before leaving."
+    }
+
+  ]
+}

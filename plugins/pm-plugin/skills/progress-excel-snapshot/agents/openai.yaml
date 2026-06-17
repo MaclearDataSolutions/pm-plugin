@@ -1,0 +1,5 @@
+interface:
+  display_name: Progress Excel Snapshot
+  short_description: Adds one dated progress worksheet without changing existing Excel sheets.
+  icon: table
+  brand_color: '#16A34A'

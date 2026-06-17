@@ -1,0 +1,11 @@
+{
+  "role": "personal",
+  "user_name": "Your Name",
+  "user_email": "your.email@company.com",
+  "linked_projects": [
+    {
+      "jira_project_key": "PROJ1",
+      "jira_cloud_id": "your-org.atlassian.net"
+    }
+  ]
+}

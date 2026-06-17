@@ -1,0 +1,15 @@
+interface:
+  display_name: Project Owner Questionnaire
+  short_description: Collect project owner answers and save a filled questionnaire
+    for Gantt planning.
+  icon: clipboard-list
+  color: blue
+  icon_small: assets/icon.svg
+  icon_large: assets/icon.svg
+policy:
+  products:
+  - chatgpt
+  - codex
+  - api
+  - atlas
+  allow_implicit_invocation: true

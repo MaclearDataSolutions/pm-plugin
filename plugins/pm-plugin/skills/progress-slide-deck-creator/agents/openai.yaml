@@ -1,0 +1,5 @@
+interface:
+  display_name: Progress Slide Deck Creator
+  short_description: Creates a new dated progress deck from progress_update.md and a template.
+  icon: presentation
+  brand_color: '#7C3AED'

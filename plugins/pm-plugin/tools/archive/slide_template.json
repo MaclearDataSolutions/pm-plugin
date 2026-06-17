@@ -1,0 +1,213 @@
+{
+  "_comment": "Slide deck template v1. Hybrid approach: (1) pptx_template defines the visual layout — slide master, fonts, colors, placeholder positions. (2) slides defines content structure — what goes on each slide, which data source feeds it, and where the Gantt image is inserted. Edit here to change slide order, content, or layout without touching the Python script.",
+
+  "meta": {
+    "version": "v1",
+    "template_enabled": true,
+    "project_name": "Project",
+    "description": "Standard project introduction slide deck template. Controls slide order, content mapping, and Gantt image insertion.",
+    "pptx_template": "tools/slide_template_v1.pptx"
+  },
+
+  "sources": {
+    "_comment": "Files the script reads to populate slide content. Paths are relative to the project root.",
+    "project_plan": "project_plan.md",
+    "gantt_csv":    "gantt_tasks.csv",
+    "gantt_excel":  "gantt_chart.xlsx"
+  },
+
+  "gantt_image": {
+    "_comment": "Controls how the Gantt Timeline is exported from Excel and inserted into the slide. Uses xlwings COM automation (Windows + Excel required).",
+    "sheet":         "Gantt Timeline",
+    "export_path":   "gantt_timeline_export.png",
+    "dpi":           150,
+    "row_start":     1,
+    "col_start":     1,
+    "row_end":       null,
+    "col_end":       null,
+    "_note":         "row_end and col_end null means export the full used range of the sheet."
+  },
+
+  "style": {
+    "_comment": "Visual style settings applied when no pptx_template is found — fallback only. When pptx_template exists, colors and fonts come from the template file.",
+    "primary_color":    "1F3864",
+    "secondary_color":  "2E75B6",
+    "accent_color":     "FFC000",
+    "text_color":       "000000",
+    "background_color": "FFFFFF",
+    "font_title":       "Calibri",
+    "font_body":        "Calibri",
+    "font_size_title":  28,
+    "font_size_body":   16
+  },
+
+  "slides": [
+
+    {
+      "id": "S1",
+      "name": "Title",
+      "layout": "Title Slide",
+      "title": "{project_name}",
+      "subtitle": "Project Introduction — {date}",
+      "content_type": "title_only",
+      "speaker_notes": "Welcome and introduce the project. State the project name, sponsor, and today's date."
+    },
+
+    {
+      "id": "S2",
+      "name": "Why This Project",
+      "layout": "Title and Content",
+      "title": "Why This Project Matters",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "4. Business purpose and success criteria",
+        "fields": ["Business problem", "Main business value"]
+      },
+      "max_bullets": 5,
+      "speaker_notes": "Explain the business problem this project solves and the value it delivers."
+    },
+
+    {
+      "id": "S3",
+      "name": "Scope and Deliverables",
+      "layout": "Title and Content",
+      "title": "Scope and Expected Deliverables",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "5. Scope",
+        "fields": ["In scope", "Must-have requirements"]
+      },
+      "max_bullets": 6,
+      "speaker_notes": "Cover what is in scope and the must-have deliverables. Briefly note what is out of scope."
+    },
+
+    {
+      "id": "S4",
+      "name": "Success Criteria",
+      "layout": "Title and Content",
+      "title": "Success Criteria and Acceptance",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "4. Business purpose and success criteria",
+        "fields": ["Success criteria"]
+      },
+      "table_columns": ["Success criterion", "How it will be checked", "Owner / approver"],
+      "max_rows": 5,
+      "speaker_notes": "Walk through how success will be measured and who approves each criterion."
+    },
+
+    {
+      "id": "S5",
+      "name": "Gantt Timeline",
+      "layout": "Title and Content",
+      "title": "Project Timeline",
+      "content_type": "gantt_image",
+      "gantt_source": "gantt_excel",
+      "image_position": {
+        "left_pct":   0.04,
+        "top_pct":    0.18,
+        "width_pct":  0.92,
+        "height_pct": 0.75
+      },
+      "speaker_notes": "Walk through the project timeline. Highlight the critical path, parallel tracks, and any at-risk tasks."
+    },
+
+    {
+      "id": "S6",
+      "name": "Key Milestones",
+      "layout": "Title and Content",
+      "title": "Key Milestones",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "7. Milestones",
+        "fields": ["Milestone", "Target date", "Approval needed", "Notes"]
+      },
+      "table_columns": ["Milestone", "Target date", "Approval needed", "Notes"],
+      "max_rows": 6,
+      "speaker_notes": "Highlight the key approval gates and fixed deadlines. Call out any milestone with approval needed."
+    },
+
+    {
+      "id": "S7",
+      "name": "Workstreams and Tasks",
+      "layout": "Title and Content",
+      "title": "Workstreams and Task Summary",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "8. Work breakdown structure",
+        "fields": ["Work package", "Description"]
+      },
+      "max_bullets": 7,
+      "speaker_notes": "Summarise the main work packages. Keep it high level — detail is in the Gantt."
+    },
+
+    {
+      "id": "S8",
+      "name": "Roles and Responsibilities",
+      "layout": "Title and Content",
+      "title": "Roles and Responsibilities",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "14. Resource plan",
+        "fields": ["Resource / role", "Person or vendor", "Responsibilities", "Planning risk"]
+      },
+      "table_columns": ["Role", "Person", "Responsibilities", "Risk"],
+      "max_rows": 6,
+      "speaker_notes": "Introduce the team. Highlight any resource constraints or single points of failure."
+    },
+
+    {
+      "id": "S9",
+      "name": "Risks and Mitigation",
+      "layout": "Title and Content",
+      "title": "Risks and Mitigation Plan",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "16. Risk register",
+        "fields": ["Risk", "Probability", "Severity", "Response / mitigation", "Owner"]
+      },
+      "table_columns": ["Risk", "Probability", "Severity", "Mitigation", "Owner"],
+      "max_rows": 5,
+      "speaker_notes": "Cover the top risks and how they are being managed. Focus on High severity items."
+    },
+
+    {
+      "id": "S10",
+      "name": "Open Decisions",
+      "layout": "Title and Content",
+      "title": "Open Decisions and Information Needed",
+      "content_type": "table",
+      "content_source": {
+        "file": "project_plan",
+        "section": "20. Open questions before final Gantt chart",
+        "fields": ["Priority", "Question", "Who should answer"]
+      },
+      "table_columns": ["Priority", "Question", "Who should answer"],
+      "max_rows": 5,
+      "speaker_notes": "These are the decisions that need to be made before the project can proceed. Assign owners in the room."
+    },
+
+    {
+      "id": "S11",
+      "name": "Next Steps",
+      "layout": "Title and Content",
+      "title": "Recommended Next Steps",
+      "content_type": "bullets",
+      "content_source": {
+        "file": "project_plan",
+        "section": "21. Recommended next steps",
+        "fields": []
+      },
+      "max_bullets": 6,
+      "speaker_notes": "Close with concrete actions and owners. Confirm who does what and by when before leaving the room."
+    }
+
+  ]
+}

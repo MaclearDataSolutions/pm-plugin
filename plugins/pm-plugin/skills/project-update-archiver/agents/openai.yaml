@@ -1,0 +1,3 @@
+interface:
+  display_name: Project Update Archiver
+  short_description: Archives processed project update source files safely.

@@ -1,0 +1,5 @@
+interface:
+  display_name: Progress Update Clarifier
+  short_description: Clarifies progress-only update notes before reporting.
+  icon: question-circle
+  brand_color: '#2563EB'
