@@ -14,11 +14,10 @@ gh auth login
 
 Or configure an SSH key or PAT in your git credential store.
 
-### Step 2 — Add marketplace + install (run once per machine)
+### Step 2 — Install the plugin (run once per machine)
 
 ```bash
-claude plugin marketplace add github:MaclearDataSolutions/pm-plugin
-claude plugin install pm-plugin
+claude plugin install github:MaclearDataSolutions/pm-plugin
 ```
 
 ### Step 3 — Authenticate Jira
@@ -56,8 +55,7 @@ cp "$(claude plugin path pm-plugin)/config-templates/project.pm-config.json" .pm
 ## Updating the plugin
 
 ```bash
-claude plugin marketplace update pm-plugin
-claude plugin update pm-plugin
+claude plugin update github:MaclearDataSolutions/pm-plugin
 ```
 
 Skills, scripts, and templates update. All `project/` data and `.pm-config.json` files in your workspaces are untouched.
@@ -72,4 +70,4 @@ Access is gated by GitHub org membership. To grant access: add the person to the
 
 ## Full skill reference
 
-See [plugins/pm-plugin/CLAUDE.md](plugins/pm-plugin/CLAUDE.md) for the complete skill list and workflow.
+See [CLAUDE.md](CLAUDE.md) for the complete skill list and workflow.
