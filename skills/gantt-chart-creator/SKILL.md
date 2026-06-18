@@ -142,6 +142,7 @@ Before finishing, verify:
 - `project/gantt_chart.md` exists and was written before Excel.
 - The project flow comes from visible task order and dependencies.
 - Every task has task, estimated start, estimated end, duration, owner/status/progress/resource fields, even when the value is `Unknown`.
+- Every task row has a `Status` value in the `Status` column (`To Do`, `In Progress`, or `Done`). Default to `To Do` for all newly generated tasks.
 - Estimated durations and dates are clearly marked as assumptions or estimates.
 - The Mermaid chart starts with `gantt` and includes `dateFormat YYYY-MM-DD`.
 - No prewritten Excel-generation Python file from this skill was used.

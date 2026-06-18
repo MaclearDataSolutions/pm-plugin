@@ -105,7 +105,7 @@ Duration column in gantt_tasks.csv is in business days. Convert to Jira `timeori
 ## Rules
 
 - Never delete Jira issues. Removed tasks get a comment, not a deletion.
-- Never transition issue status — that is the team's responsibility.
+- Never transition issue status — use `/jira-board-refresh` to sync completion status to the Jira board.
 - If `getJiraProjectIssueTypesMetadata` returns no Epic type, use Story for work packages and note the limitation in the report.
 - If a task's work package does not match any existing Epic in the current sync, create a new Epic for it.
 - Mark all estimates as "Planning assumption — confirm with team" in the description if Duration was marked as an assumption in gantt_tasks.csv.
