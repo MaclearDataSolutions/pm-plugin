@@ -1,20 +1,10 @@
 {
   "name": "maclear-pm-plugin",
+  "version": "1.0.1",
   "description": "Marketplace for pm-plugin — project management plugin for Claude Code",
   "owner": {
     "name": "Maclear Data Solutions",
     "email": "harris.yang@maclear.ca"
   },
-  "plugins": [
-    {
-      "name": "pm-plugin",
-      "description": "Private project management plugin — plans, Gantt, Jira sync, cross-project dashboard",
-      "version": "1.0.1",
-      "source": ".",
-      "author": {
-        "name": "Maclear Data Solutions",
-        "email": "harris.yang@maclear.ca"
-      }
-    }
-  ]
+  "plugins": ".claude-plugin/plugin.json"
 }
