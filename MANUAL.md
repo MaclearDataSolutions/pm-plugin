@@ -311,6 +311,18 @@ Reads `project/jira_sync.json` for all task Jira keys, calls Jira for each task'
 
 **Output:** `project/effort_vs_actuals.md`
 
+### Step 3b: Jira board refresh (optional)
+
+```
+/jira-board-refresh
+```
+
+Reads `project/gantt_tasks.csv` (Status column) and optionally `project/progress_clarification_log.md` to determine the target status for every task. Shows a preview table of all planned Jira transitions — Tasks/Stories, Epics (via roll-up), and milestones — and waits for confirmation before applying any changes.
+
+Run this step when task completions should be reflected on the Jira board. It is safe to skip if the team manages Jira board status manually.
+
+**Output:** `project/jira_board_refresh.md` — report of transitions applied, skipped, flagged, and any errors
+
 ### Step 4: Update artifacts (run any or all)
 
 ```
@@ -378,16 +390,23 @@ When `/jira-project-sync` runs after a replan:
 
 ### pm-status sentinel format
 
-The pm-status ticket description follows a machine-readable format so Personal PM can parse it reliably:
+The pm-status ticket description follows a machine-readable format so Personal PM can parse it reliably. The description starts with a sentinel comment, followed immediately by a JSON code block:
 
 ```
 <!-- pm-status-v1 -->
+```
+
 ```json
 { "schema_version": "1.0", "rag_status": "amber", ... }
 ```
-```
 
 If you ever edit the pm-status ticket description manually, preserve the `<!-- pm-status-v1 -->` sentinel line and the JSON block that follows it.
+
+### Board status refresh
+
+`/jira-board-refresh` transitions issues to match the `Status` column in `gantt_tasks.csv`. It never creates or deletes issues. Run it after a Lane B progress review when completed tasks should be moved to Done on the board.
+
+The pm-status ticket (label: `pm-status`) is always excluded from transitions — use `/pm-status-broadcast` for that ticket.
 
 ---
 

@@ -38,7 +38,11 @@ Or configure an SSH key or PAT in your git credential store.
 ### Step 2 — Install the plugin (run once per machine)
 
 ```bash
-claude plugin install github:MaclearDataSolutions/pm-plugin
+
+claude plugin marketplace add https://github.com/MaclearDataSolutions/pm-plugin
+
+claude plugin install pm-plugin  
+
 ```
 
 ### Step 3 — Authenticate Jira
@@ -120,6 +124,7 @@ Then run `/jira-project-sync` to push the replanned tasks to Jira.
 | `/repo-progress-capture` | Daily/weekly, after placing notes in `progress_inputs/` | `project/progress_update.md` |
 | `/progress-update-clarifier` | After capture | `project/progress_clarification_log.md` |
 | `/jira-progress-pull` | After clarifier | `project/effort_vs_actuals.md` |
+| `/jira-board-refresh` | After `/progress-update-clarifier` (optional: after `/jira-progress-pull`) | `project/jira_board_refresh.md` |
 | `/progress-plan-log-appender` | After clarifier | Appends `## YYYY-MM-DD` entry to `project/project_plan.md` |
 | `/progress-excel-snapshot` | After clarifier | Adds `YYYY-MM-DD` worksheet to `project/gantt_chart.xlsx` |
 | `/progress-slide-deck-creator` | After clarifier | `progress_reports/YYYY-MM-DD_progress_deck.pptx` |
