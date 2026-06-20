@@ -1,7 +1,7 @@
 ---
 name: jira-board-refresh
 description: use this skill in a project workspace to sync task completion status to the Jira board. Reads project/gantt_tasks.csv (Status column) and optionally project/progress_clarification_log.md, builds a target status map, shows a preview of all planned transitions, waits for YES confirmation, then transitions Tasks/Stories, Epics (via roll-up), and milestones to match. Writes project/jira_board_refresh.md. Requires project/jira_sync.json — run /jira-project-sync first if missing.
-allowed-tools: Read, Write, mcp__atlassian-rovo-mcp__getTransitionsForJiraIssue, mcp__atlassian-rovo-mcp__transitionJiraIssue, mcp__atlassian-rovo-mcp__getJiraIssue, mcp__atlassian-rovo-mcp__searchJiraIssuesUsingJql
+allowed-tools: Read, Write, mcp__atlassian-rovo-mcp__getTransitionsForJiraIssue, mcp__atlassian-rovo-mcp__transitionJiraIssue, mcp__atlassian-rovo-mcp__getJiraIssue, mcp__atlassian-rovo-mcp__searchJiraIssuesUsingJql, mcp__atlassian-rovo-mcp__editJiraIssue
 ---
 
 # Jira Board Refresh
@@ -105,13 +105,13 @@ Jira Board Refresh — Preview
 ─────────────────────────────────────────────────────────────────────
  Issue     Summary                          Current         → Target
 ─────────────────────────────────────────────────────────────────────
- COR-2     Stakeholder interviews           To Do           → In Progress
+ COR-2     Stakeholder interviews           To Do           → In Progress  [due: 2026-07-10 → 2026-07-08]
  COR-3     Requirements doc                 In Progress     → Done
  COR-5     Discovery Complete (milestone)   To Do           → Done
  COR-1     Discovery (Epic)                 In Progress     → Done
  COR-8     Workshop facilitation            To Do           → To Do     [skip]
 ─────────────────────────────────────────────────────────────────────
- 4 transitions queued. 1 skipped (no change). 0 flagged.
+ 4 transitions queued. 2 field updates queued. 1 skipped (no change). 0 flagged.
 
 Flagged (will not transition):
   COR-11  Phase 2 Complete (milestone) — date passed but work package incomplete
@@ -136,10 +136,10 @@ Status source: CSV + Lane B log  (or: CSV only — log not found)
 
 ## Transitions Applied
 
-| Issue | Summary | From | To | Result |
-|-------|---------|------|----|--------|
-| COR-2 | Stakeholder interviews | To Do | In Progress | Success |
-| COR-3 | Requirements doc | In Progress | Done | Success |
+| Issue | Summary | From | To | Field Updates | Result |
+|-------|---------|------|----|---------------|--------|
+| COR-2 | Stakeholder interviews | To Do | In Progress | due: 2026-07-10 → 2026-07-08 | Success |
+| COR-3 | Requirements doc | In Progress | Done | — | Success |
 
 ## Skipped (no change needed)
 
@@ -164,10 +164,12 @@ Status source: CSV + Lane B log  (or: CSV only — log not found)
 
 1. Read `.pm-config.json` → get `jira_project_key`, `jira_cloud_id`, `project_name`. Stop if any required field is missing: "`.pm-config.json` is missing required fields: {list}."
 2. Read `project/jira_sync.json`. If absent: stop with "Run `/jira-project-sync` first to create the task registry."
-3. Read `project/gantt_tasks.csv`. Build the primary status map: `task_id → Status`. If `Status` column is absent or blank for a row, default to `To Do`.
+3. Read `project/gantt_tasks.csv`. Build: (1) primary status map: `task_id → Status` (default `To Do` if `Status` column is absent or blank); (2) date map: `task_id → { start_date: value of "Estimated start" column, due_date: value of "Estimated end" column }`. Store `null` for any blank or missing date value.
 4. If `project/progress_clarification_log.md` exists: scan for task names explicitly marked completed or in-progress. Supplement the map where CSV status is blank or `To Do`. If the log is absent, note "Lane B log not found — using CSV status only" in the report header.
 5. Call `getTransitionsForJiraIssue` with `cloudId` = jira_cloud_id, `issueIdOrKey` = first task's jira_key, to discover transition names and IDs. Map transitions to `To Do`, `In Progress`, and `Done` by name matching. If ALL three mappings fail (no usable transitions found), stop and list the available transition names so the user can investigate the Jira workflow configuration. If only some mappings fail, continue — issues requiring an unmapped status will be skipped and flagged at execution time.
-6. **Tasks/Stories:** For each task in `jira_sync.json` tasks array: call `getJiraIssue` with `cloudId` and the task's `jira_key`, extract current status from the response, resolve target status from the map, queue transition if status differs.
+6. **Tasks/Stories:** For each task in `jira_sync.json` tasks array: call `getJiraIssue` with `cloudId` and the task's `jira_key`, requesting `fields: ["status", "duedate", "start", "customfield_10015"]`. From the response:
+   - **Status transition:** extract current status name, resolve target status from the map, queue a transition if status differs.
+   - **Field sync:** look up this task's `task_id` in the date map from step 3. Compare CSV `due_date` against the Jira `duedate` field value; compare CSV `start_date` against the Jira `start` field (fall back to `customfield_10015` if `start` is null). If either CSV value differs from the Jira value, or if the Jira field is null but the CSV has a date, queue an `editJiraIssue` call with only the changed fields (`duedate`, `start`, or both).
 7. **Epics:** For each Epic in `jira_sync.json` epics array: evaluate child task statuses, call `getJiraIssue`, queue or flag.
 8. **Milestones:** For each milestone in `jira_sync.json` milestones array: check date and work-package completion, call `getJiraIssue`, queue or flag.
 9. Display the preview table with all queued transitions, skips, and flags. Wait for `YES`.
@@ -187,6 +189,7 @@ Status source: CSV + Lane B log  (or: CSV only — log not found)
 | `progress_clarification_log.md` absent | Proceed CSV-only; note in report header |
 | Epic roll-up indeterminate | Skip + flag: "mixed child states — manual review recommended" |
 | Epic has no child tasks in `jira_sync.json` | Skip + flag: "Epic {epic_key} has no registered child tasks — run `/jira-project-sync`." |
+| `editJiraIssue` field update fails | Record error in report under Errors table, continue with remaining transitions and field updates |
 
 ## Rules
 

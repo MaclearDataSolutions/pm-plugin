@@ -37,6 +37,8 @@ Base the output on what is visible in the repo. Do not invent confirmed facts. I
 
 0b. If `meta.template_enabled` is `true`, read `source_table.columns` from the template. Use these column names, order, `align` values, `type`, `required`, and `default` values when writing the `## Project management source table` in `gantt_chart.md`. Do not freely choose column names or order when the template is active.
 
+**`Parent task ID` column:** Optional. If a task row has a value here (e.g. `T2`), that task is a subtask of the referenced task in Jira. Leave blank for top-level tasks. Validation: a task cannot reference itself as its own parent; a task whose `Task ID` is referenced as a parent must not itself have a `Parent task ID` value (only one level of nesting).
+
 1. Read the full `project/project_plan.md` and any relevant visible repo files.
 2. Identify the best available task table. Prefer a table with task, duration, dependencies, owner, status, progress, or resource columns.
 3. Preserve the visible task order from the Markdown. Treat that order as the project flow when dependency data is missing.
@@ -96,8 +98,8 @@ Always write this structure:
 
 ## Project management source table
 
-| Task ID | Work package | Task | Task description | Owner / role | Resource requirements | Estimated start | Estimated end | Duration (business days) | Timeline basis | Task bar | Milestone? | Milestone date | Depends on | Progress | Status | Source evidence | Assumption / unknown notes |
-|---|---|---|---|---|---|---:|---:|---:|---|---|---|---:|---|---|---|---|---|
+| Task ID | Work package | Task | Task description | Owner / role | Resource requirements | Estimated start | Estimated end | Duration (business days) | Timeline basis | Task bar | Milestone? | Milestone date | Depends on | Parent task ID | Progress | Status | Source evidence | Assumption / unknown notes |
+|---|---|---|---|---|---|---:|---:|---:|---|---|---|---:|---|---|---|---|---|---|
 
 When `meta.template_enabled` is `true`, derive this header row and separator row from `source_table.columns` in the template instead of using the hardcoded column list above. Use `align: "right"` → `---:` and `align: "left"` → `---` for each column.
 
@@ -142,6 +144,7 @@ Before finishing, verify:
 - `project/gantt_chart.md` exists and was written before Excel.
 - The project flow comes from visible task order and dependencies.
 - Every task has task, estimated start, estimated end, duration, owner/status/progress/resource fields, even when the value is `Unknown`.
+- The `Parent task ID` column is present in the source table. Values are either blank or a valid `Task ID` from the same table. No task is its own parent, and no parent task itself has a non-blank `Parent task ID`.
 - Every task row has a `Status` value in the `Status` column (`To Do`, `In Progress`, or `Done`). Default to `To Do` for all newly generated tasks.
 - Estimated durations and dates are clearly marked as assumptions or estimates.
 - The Mermaid chart starts with `gantt` and includes `dateFormat YYYY-MM-DD`.
