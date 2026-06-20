@@ -39,6 +39,8 @@ Base the output on what is visible in the repo. Do not invent confirmed facts. I
 
 **`Parent task ID` column:** Optional. If a task row has a value here (e.g. `T2`), that task is a subtask of the referenced task in Jira. Leave blank for top-level tasks. Validation: a task cannot reference itself as its own parent; a task whose `Task ID` is referenced as a parent must not itself have a `Parent task ID` value (only one level of nesting).
 
+**`Story points` column:** Auto-estimated using Fibonacci scale (1, 2, 3, 5, 8, 13, 21). Estimate each task based on: task description and name (clear/well-scoped = lower; vague/multi-part = higher), duration (longer tends higher, but approval steps stay low), dependencies (many predecessors = coordination risk, bump up), and resource requirements (multiple people or vendors = bump up). Rough guide: 1=trivial; 2=simple; 3=moderate; 5=non-trivial; 8=complex; 13=very large (consider splitting); 21=extremely large (strongly recommend splitting). Leave blank for milestone rows. Mark every auto-estimate in the `Assumption / unknown notes` column as: "Story points: planning assumption — confirm with team."
+
 1. Read the full `project/project_plan.md` and any relevant visible repo files.
 2. Identify the best available task table. Prefer a table with task, duration, dependencies, owner, status, progress, or resource columns.
 3. Preserve the visible task order from the Markdown. Treat that order as the project flow when dependency data is missing.
@@ -98,8 +100,8 @@ Always write this structure:
 
 ## Project management source table
 
-| Task ID | Work package | Task | Task description | Owner / role | Resource requirements | Estimated start | Estimated end | Duration (business days) | Timeline basis | Task bar | Milestone? | Milestone date | Depends on | Parent task ID | Progress | Status | Source evidence | Assumption / unknown notes |
-|---|---|---|---|---|---|---:|---:|---:|---|---|---|---:|---|---|---|---|---|---|
+| Task ID | Work package | Task | Task description | Owner / role | Resource requirements | Estimated start | Estimated end | Duration (business days) | Story points | Timeline basis | Task bar | Milestone? | Milestone date | Depends on | Parent task ID | Progress | Status | Source evidence | Assumption / unknown notes |
+|---|---|---|---|---|---|---:|---:|---:|---:|---|---|---|---:|---|---|---|---|---|---|
 
 When `meta.template_enabled` is `true`, derive this header row and separator row from `source_table.columns` in the template instead of using the hardcoded column list above. Use `align: "right"` → `---:` and `align: "left"` → `---` for each column.
 
@@ -145,6 +147,7 @@ Before finishing, verify:
 - The project flow comes from visible task order and dependencies.
 - Every task has task, estimated start, estimated end, duration, owner/status/progress/resource fields, even when the value is `Unknown`.
 - The `Parent task ID` column is present in the source table. Values are either blank or a valid `Task ID` from the same table. No task is its own parent, and no parent task itself has a non-blank `Parent task ID`.
+- The `Story points` column is present in the source table. Every non-milestone task row has a Fibonacci value (1, 2, 3, 5, 8, 13, or 21). Milestone rows have a blank `Story points` value. Every auto-estimated value has "Story points: planning assumption — confirm with team" in its `Assumption / unknown notes` column.
 - Every task row has a `Status` value in the `Status` column (`To Do`, `In Progress`, or `Done`). Default to `To Do` for all newly generated tasks.
 - Estimated durations and dates are clearly marked as assumptions or estimates.
 - The Mermaid chart starts with `gantt` and includes `dateFormat YYYY-MM-DD`.

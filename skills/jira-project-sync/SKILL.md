@@ -109,18 +109,18 @@ Map the project plan to Jira: create Epics, Stories, and milestone Tasks. Store 
    - `summary` = Task name column
    - `description` = Task description column (if present)
    - `parent` = the Epic key for this row's work package
-   - `additional_fields`: set `timeoriginalestimate` to Duration (business days) × 8 × 3600 (seconds). For example, 5 days = 144000 seconds. Set `duedate` = Estimated end column value (format: YYYY-MM-DD); set `start` = Estimated start column value (format: YYYY-MM-DD). Omit a date field entirely if its CSV value is blank or missing.
+   - `additional_fields`: set `timeoriginalestimate` to Duration (business days) × 8 × 3600 (seconds). For example, 5 days = 144000 seconds. Set `duedate` = Estimated end column value (format: YYYY-MM-DD); set `start` = Estimated start column value (format: YYYY-MM-DD). Omit a date field entirely if its CSV value is blank or missing. If `Story points` column is non-blank for this row, set `story_points` = the integer value; if the API returns a field-unknown error for `story_points`, retry the field as `customfield_10016`. If both fail, note: "Story points field not found for {jira_key} — check Jira project configuration." and continue.
    - If no existing issue in jira_sync.json: create with `createJiraIssue`.
-   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, and start.
+   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, start, and story points (if non-blank in CSV).
 6a. **Create or update Subtasks — Pass 2** — for every row where `Milestone?` = `No` (or empty) AND `Parent task ID` column is non-empty:
    - Resolve the parent task's Jira key from `jira_sync.json` tasks array using `Parent task ID` value as `task_id`. If not found (parent was skipped or not yet synced), skip this subtask and flag: "Subtask {task_id} skipped — parent {parent_task_id} not found in jira_sync.json. Re-run /jira-project-sync to register it."
    - `issueTypeName` = the subtask issue type name discovered in step 4 via `getJiraProjectIssueTypesMetadata`. Try `Subtask` first, then `Sub-task` as fallback. If neither is present in the project's available types, flag: "No subtask issue type found for project {jira_project_key} — subtask {task_id} skipped." and continue.
    - `parent` = parent task's `jira_key` (the Story key, not the Epic key).
    - `summary` = Task name column.
    - `description` = Task description column (if present).
-   - `additional_fields`: set `timeoriginalestimate`, `duedate`, `start` using the same rules as Step 6. Do NOT set `parent` to the Epic key — Jira inherits the Epic link from the parent Story automatically.
+   - `additional_fields`: set `timeoriginalestimate`, `duedate`, `start`, and `story_points` (with `customfield_10016` fallback) using the same rules as Step 6. Do NOT set `parent` to the Epic key — Jira inherits the Epic link from the parent Story automatically.
    - If no existing issue in jira_sync.json: create with `createJiraIssue`.
-   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, and start.
+   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, start, and story points (if non-blank in CSV).
    - Write to `jira_sync.json` tasks array with `is_subtask: true`, `parent_task_id` = the CSV value, `parent_jira_key` = resolved parent Jira key.
 7. **Create or update milestone Tasks** — for every row where `Milestone?` = `Yes`:
    - `issueTypeName` = Task
@@ -148,7 +148,7 @@ Map the project plan to Jira: create Epics, Stories, and milestone Tasks. Store 
    - `summary` = `[{project_name}] PM Status`
    - `additional_fields`: `labels` = ["pm-status"]
 10. Write updated `project/jira_sync.json` with all IDs, using ISO 8601 timestamp for `last_synced`.
-11. Report: counts of Epics created/updated, tasks created/updated (top-level + subtasks separately), milestones created/updated, issue links created/skipped, pm-status ticket key.
+11. Report: counts of Epics created/updated, tasks created/updated (top-level + subtasks separately), milestones created/updated, issue links created/skipped, story points synced/skipped (including any field-not-found warnings), pm-status ticket key.
 
 ## Estimation conversion
 
