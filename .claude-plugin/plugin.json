@@ -1,7 +1,7 @@
 {
   "name": "pm-plugin",
   "description": "Private project management plugin — plans, Gantt, Jira sync, cross-project dashboard",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": {
     "name": "Maclear Data Solutions",
     "email": "harris.yang@maclear.ca"
