@@ -4,6 +4,8 @@ Private Claude Code plugin for Maclear Data Solutions. Turns a project brief int
 
 Two modes, one plugin: **Project PM** manages a single project end-to-end; **Personal PM** gives you a cross-project dashboard across every project you're involved in.
 
+**What syncs to Jira:** Epics, Stories (with start date, due date, time estimate, story points), Subtasks, milestone Tasks, issue links (blocks / is blocked by), and status transitions.
+
 ---
 
 ## Architecture
@@ -62,6 +64,31 @@ This creates `.pm-config.json`, verifies your Jira project access, and links all
 
 ---
 
+## Jira project setup
+
+Before running `/jira-project-sync` for the first time, check these Jira settings.
+
+### Story Points field
+
+`/gantt-chart-creator` auto-estimates story points (Fibonacci 1–21) for every task. `/jira-project-sync` pushes them to Jira automatically — but the field must exist in your project first.
+
+**Team-managed (next-gen) projects** — Story Points is a native field. Nothing to configure; it works out of the box.
+
+**Company-managed (classic) projects** — Story Points (`customfield_10016`) is created automatically when a Scrum or Kanban board is added to the project. If your project has neither:
+
+1. Go to your Jira project → **Project settings → Issue types → Story**
+2. Click the screen name under **Edit fields**
+3. Find **Story Points** in the field list and drag it onto the screen
+4. Save — then re-run `/jira-project-sync`
+
+> `/jira-project-sync` checks for the Story Points field before syncing. If the field is not found in the project, story points are skipped silently and noted in the sync report. Everything else (epics, tasks, dates, links) still syncs normally.
+
+### Issue link types
+
+`/jira-project-sync` creates **Blocks / Is blocked by** links from the `Depends on` column in the Gantt CSV. These link types exist by default in all Jira projects. If your project uses a custom workflow with renamed link types, the sync report will list what it found so you can investigate.
+
+---
+
 ## Quick start — new project
 
 ```bash
@@ -101,9 +128,9 @@ cd ~/personal-pm
 |-------|------------|--------|
 | `/project-owner-questionnaire` | Once, at project start | `project/empty_questionnaire.md` → `project/filled_questionnaire.md` |
 | `/questionnaire-project-plan` | After questionnaire | `project/project_plan.md` |
-| `/gantt-chart-creator` | After plan | `project/gantt_chart.md`, `project/gantt_chart.xlsx`, `project/gantt_tasks.csv` |
+| `/gantt-chart-creator` | After plan | `project/gantt_chart.md`, `project/gantt_chart.xlsx`, `project/gantt_tasks.csv` (includes auto-estimated story points) |
 | `/project-intro-slide-deck` | After Gantt | `project/project_intro_deck.pptx` |
-| `/jira-project-sync` | After baseline, and after every replan | `project/jira_sync.json`; creates/updates Jira Epics, Stories, Tasks |
+| `/jira-project-sync` | After baseline, and after every replan | `project/jira_sync.json`; creates/updates Jira Epics, Stories (with start date, due date, story points), Subtasks, milestone Tasks, and issue links |
 
 ### Lane A — Change / Replan
 
@@ -124,7 +151,7 @@ Then run `/jira-project-sync` to push the replanned tasks to Jira.
 | `/repo-progress-capture` | Daily/weekly, after placing notes in `progress_inputs/` | `project/progress_update.md` |
 | `/progress-update-clarifier` | After capture | `project/progress_clarification_log.md` |
 | `/jira-progress-pull` | After clarifier | `project/effort_vs_actuals.md` |
-| `/jira-board-refresh` | After `/progress-update-clarifier` (optional: after `/jira-progress-pull`) | `project/jira_board_refresh.md` |
+| `/jira-board-refresh` | After `/progress-update-clarifier` (optional: after `/jira-progress-pull`) | `project/jira_board_refresh.md`; transitions statuses and updates start/due dates |
 | `/progress-plan-log-appender` | After clarifier | Appends `## YYYY-MM-DD` entry to `project/project_plan.md` |
 | `/progress-excel-snapshot` | After clarifier | Adds `YYYY-MM-DD` worksheet to `project/gantt_chart.xlsx` |
 | `/progress-slide-deck-creator` | After clarifier | `progress_reports/YYYY-MM-DD_progress_deck.pptx` |
@@ -174,7 +201,7 @@ Starter templates are in `config-templates/` inside the plugin. Copy the right o
 ## Updating the plugin
 
 ```bash
-claude plugin update github:MaclearDataSolutions/pm-plugin
+claude plugin update  pm-plugin@maclear-pm-plugin
 ```
 
 Skills, scripts, and templates update. All `project/` data and `.pm-config.json` files in your workspaces are untouched.
