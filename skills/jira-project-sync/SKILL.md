@@ -1,8 +1,8 @@
 ---
 name: jira-project-sync
 description: use this skill after /gantt-chart-creator or after a replan to sync the project plan to Jira. Creates Epics for work packages, Stories for tasks (with originalEstimate set from plan duration), and Tasks for milestones (label "milestone", due date set). Reads project/gantt_tasks.csv and .pm-config.json. Stores all Jira issue IDs in project/jira_sync.json to prevent duplicates on re-runs.
-argument-hint: [path to gantt_tasks.csv — default: project/gantt_tasks.csv]
-allowed-tools: Read, Write, Edit, mcp__atlassian-rovo-mcp__getJiraProjectIssueTypesMetadata, mcp__atlassian-rovo-mcp__createJiraIssue, mcp__atlassian-rovo-mcp__editJiraIssue, mcp__atlassian-rovo-mcp__addCommentToJiraIssue, mcp__atlassian-rovo-mcp__searchJiraIssuesUsingJql, mcp__atlassian-rovo-mcp__getJiraIssue, mcp__atlassian-rovo-mcp__createIssueLink, mcp__atlassian-rovo-mcp__getIssueLinkTypes
+argument-hint: path to gantt_tasks.csv — default: project/gantt_tasks.csv
+allowed-tools: Read, Write, Edit, mcp__atlassian-rovo-mcp__getJiraProjectIssueTypesMetadata, mcp__atlassian-rovo-mcp__getJiraIssueTypeMetaWithFields, mcp__atlassian-rovo-mcp__createJiraIssue, mcp__atlassian-rovo-mcp__editJiraIssue, mcp__atlassian-rovo-mcp__addCommentToJiraIssue, mcp__atlassian-rovo-mcp__searchJiraIssuesUsingJql, mcp__atlassian-rovo-mcp__getJiraIssue, mcp__atlassian-rovo-mcp__createIssueLink, mcp__atlassian-rovo-mcp__getIssueLinkTypes, mcp__atlassian-rovo-mcp__lookupJiraAccountId
 ---
 
 # Jira Project Sync
@@ -102,6 +102,8 @@ Map the project plan to Jira: create Epics, Stories, and milestone Tasks. Store 
 2. Read `project/gantt_tasks.csv` (or the path from the argument). Parse all rows.
 3. If `project/jira_sync.json` exists, load it — use existing keys as the "already synced" registry.
 4. Call `getJiraProjectIssueTypesMetadata` with `cloudId` and `projectIdOrKey` → get available issue type names. Identify the exact names for Epic, Story, Task (names vary by project configuration).
+4a. **Detect story points field availability** — call `getJiraIssueTypeMetaWithFields` with `cloudId`, `projectIdOrKey`, and the Story issue type name from step 4. Scan the returned fields for a key matching `story_points` or `customfield_10016`. Set a flag `story_points_available = true` if either is found; otherwise `story_points_available = false`. Store the matching field key (`story_points` or `customfield_10016`) for use in steps 6 and 6a. If the call fails or returns no fields, default to `story_points_available = false` and continue.
+4b. **Pre-resolve assignees** — scan `gantt_tasks.csv` for unique non-blank values in the `Assignee` column. If the column is absent, set `assignees_available = false` and skip this step. Otherwise, for each unique value call `lookupJiraAccountId` with `cloudId` = jira_cloud_id and `query` = the assignee name or email. Store results as a map `{ assignee_name → account_id }`. If a lookup returns no match, log: "Assignee '{name}' not found in Jira — assignee will not be set for tasks assigned to this person." and continue. Set `assignees_available = true`.
 5. **Create or update Epics** — one per unique value in the "Work package" column:
    - If no existing Epic in jira_sync.json for this work package: call `createJiraIssue` with `issueTypeName` = Epic name, `summary` = work package name.
    - If Epic already exists: call `editJiraIssue` to update summary if it changed.
@@ -109,18 +111,18 @@ Map the project plan to Jira: create Epics, Stories, and milestone Tasks. Store 
    - `summary` = Task name column
    - `description` = Task description column (if present)
    - `parent` = the Epic key for this row's work package
-   - `additional_fields`: set `timeoriginalestimate` to Duration (business days) × 8 × 3600 (seconds). For example, 5 days = 144000 seconds. Set `duedate` = Estimated end column value (format: YYYY-MM-DD); set `start` = Estimated start column value (format: YYYY-MM-DD). Omit a date field entirely if its CSV value is blank or missing. If `Story points` column is non-blank for this row, set `story_points` = the integer value; if the API returns a field-unknown error for `story_points`, retry the field as `customfield_10016`. If both fail, note: "Story points field not found for {jira_key} — check Jira project configuration." and continue.
+   - `additional_fields`: set `timeoriginalestimate` to Duration (business days) × 8 × 3600 (seconds). For example, 5 days = 144000 seconds. Set `duedate` = Estimated end column value (format: YYYY-MM-DD); set `start` = Estimated start column value (format: YYYY-MM-DD). Omit a date field entirely if its CSV value is blank or missing. If `story_points_available = true` (from step 4a) and `Story points` column is non-blank for this row, set the detected field key (`story_points` or `customfield_10016`) = the integer value. If `story_points_available = false`, skip story points silently. If `assignees_available = true` and the `Assignee` column is non-blank for this row, look up the resolved account ID from the map built in step 4b; if found, set `assignee: { "id": account_id }` in `additional_fields`; if not found (lookup failed), skip silently.
    - If no existing issue in jira_sync.json: create with `createJiraIssue`.
-   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, start, and story points (if non-blank in CSV).
+   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, start, story points (only if `story_points_available = true` and non-blank in CSV), and assignee (only if `assignees_available = true` and non-blank in CSV).
 6a. **Create or update Subtasks — Pass 2** — for every row where `Milestone?` = `No` (or empty) AND `Parent task ID` column is non-empty:
    - Resolve the parent task's Jira key from `jira_sync.json` tasks array using `Parent task ID` value as `task_id`. If not found (parent was skipped or not yet synced), skip this subtask and flag: "Subtask {task_id} skipped — parent {parent_task_id} not found in jira_sync.json. Re-run /jira-project-sync to register it."
    - `issueTypeName` = the subtask issue type name discovered in step 4 via `getJiraProjectIssueTypesMetadata`. Try `Subtask` first, then `Sub-task` as fallback. If neither is present in the project's available types, flag: "No subtask issue type found for project {jira_project_key} — subtask {task_id} skipped." and continue.
    - `parent` = parent task's `jira_key` (the Story key, not the Epic key).
    - `summary` = Task name column.
    - `description` = Task description column (if present).
-   - `additional_fields`: set `timeoriginalestimate`, `duedate`, `start`, and `story_points` (with `customfield_10016` fallback) using the same rules as Step 6. Do NOT set `parent` to the Epic key — Jira inherits the Epic link from the parent Story automatically.
+   - `additional_fields`: set `timeoriginalestimate`, `duedate`, `start` using the same rules as Step 6. If `story_points_available = true` (from step 4a) and `Story points` is non-blank, set the detected field key. If `assignees_available = true` and the `Assignee` column is non-blank, look up the resolved account ID from the map built in step 4b; if found, set `assignee: { "id": account_id }`; if not found, skip silently. Do NOT set `parent` to the Epic key — Jira inherits the Epic link from the parent Story automatically.
    - If no existing issue in jira_sync.json: create with `createJiraIssue`.
-   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, start, and story points (if non-blank in CSV).
+   - If already exists: call `editJiraIssue` to update summary, description, timeoriginalestimate, duedate, start, story points (if non-blank in CSV), and assignee (if `assignees_available = true` and non-blank in CSV).
    - Write to `jira_sync.json` tasks array with `is_subtask: true`, `parent_task_id` = the CSV value, `parent_jira_key` = resolved parent Jira key.
 7. **Create or update milestone Tasks** — for every row where `Milestone?` = `Yes`:
    - `issueTypeName` = Task
@@ -148,7 +150,7 @@ Map the project plan to Jira: create Epics, Stories, and milestone Tasks. Store 
    - `summary` = `[{project_name}] PM Status`
    - `additional_fields`: `labels` = ["pm-status"]
 10. Write updated `project/jira_sync.json` with all IDs, using ISO 8601 timestamp for `last_synced`.
-11. Report: counts of Epics created/updated, tasks created/updated (top-level + subtasks separately), milestones created/updated, issue links created/skipped, story points synced/skipped (including any field-not-found warnings), pm-status ticket key.
+11. Report: counts of Epics created/updated, tasks created/updated (top-level + subtasks separately), milestones created/updated, issue links created/skipped, story points synced (or "Story points field not available in this project — skipped" if `story_points_available = false`), assignees resolved/failed (or "Assignee column absent — skipped" if `assignees_available = false`), pm-status ticket key.
 
 ## Estimation conversion
 
